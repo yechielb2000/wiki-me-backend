@@ -10,11 +10,11 @@ rooms_manager: RoomsManager = RoomsManager()
 
 @app.websocket("/ws/{player_name}")
 async def join_room(websocket: Player, player_name: str, room_id: str):
-    player: Player = websocket.set_name(player_name) 
+    player: Player = websocket.set_name(player_name)
     room: Room = rooms_manager.get_room_if_exists(room_id)
     if not room:
         player.close(reason=f"Room id ({room_id}) does not exists.")
-        return 
+        return
     if not room.get_player_if_exists(player_name):
         player.close(reason="Name is already taken.")
         return
@@ -35,7 +35,7 @@ async def join_room(websocket: Player, player_name: str, room_id: str):
 
 @app.websocket("/ws/{player_name}")
 async def create_room(websocket: Player, player_name: str, room_name: str, **kwargs):
-    try: 
+    try:
         room: Room = await rooms_manager.create_room(room_name=room_name, kwargs=kwargs)
         join_room(websocket, player_name, room_id=room.id)
     except WebSocketDisconnect:

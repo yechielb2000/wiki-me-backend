@@ -3,7 +3,9 @@ from starlette.types import Receive, Scope, Send
 
 
 class Player(WebSocket):
-    def __init__(self, scope: Scope, receive: Receive, send: Send, name: str = None) -> None:
+    def __init__(
+        self, scope: Scope, receive: Receive, send: Send, name: str = None
+    ) -> None:
         super().__init__(scope, receive, send)
         self.name = name
 
