@@ -1,3 +1,4 @@
+from typing import Union
 from src.socket.room import Room
 
 
@@ -5,21 +6,20 @@ class RoomsManager:
     def __init__(self) -> None:
         self.active_rooms: list[Room] = list()
 
-    def room_exists(self, room: Room) -> bool:
-        return room in self.active_rooms
-
-    async def create_room(self, room_name: str, **kwargs) -> None:
+    async def create_room(self, room_name: str, **kwargs) -> Room:
         room = Room(room_name, **kwargs)
-        while self.id_exists(room):
+        while self.get_room_if_exists(room.id):
             room.set_random_id()
         await self.active_rooms.append(room)
+        return room
 
     def remove_room(self, room: Room):
-        if self.room_exists(room):
+        if self.get_room_if_exists(room.id):
+            room.disconnect_all()
             self.active_rooms.remove(room)
 
-    def id_exists(self, room: Room) -> bool:
+    def get_room_if_exists(self, room_id: str) -> Union[Room, None]:
         for active_room in self.active_rooms:
-            if room.id == active_room.id:
-                return True
-        return False
+            if room_id == active_room.id:
+                return active_room
+        return None

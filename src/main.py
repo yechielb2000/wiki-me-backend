@@ -1,68 +1,42 @@
+import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-from src.socket.room import ConnectionManager
+from src.socket.rooms_manager import RoomsManager
+from src.socket.room import Room
+from src.socket.player import Player
 
 app = FastAPI()
-socket: ConnectionManager = ConnectionManager()
-
-HTML = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
+rooms_manager: RoomsManager = RoomsManager()
 
 
-@app.get("/")
-async def get():
-    return HTMLResponse(HTML)
-
-
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
-    await socket.connect(websocket)
-    if websocket in socket.active_connections:
-        await socket.broadcast(f"{socket.active_connections}")
+@app.websocket("/ws/{player_name}")
+async def join_room(websocket: Player, player_name: str, room_id: str):
+    player: Player = websocket.set_name(player_name) 
+    room: Room = rooms_manager.get_room_if_exists(room_id)
+    if not room:
+        player.close(reason=f"Room id ({room_id}) does not exists.")
+        return 
+    if not room.get_player_if_exists(player_name):
+        player.close(reason="Name is already taken.")
+        return
     try:
+        await room.connect(player)
+        if player in room.active_players:
+            await room.broadcast(json.dumps(room.active_players))
         while True:
-            data = await websocket.receive_text()
-            await socket.send_personal_message(f"You wrote: {data}", websocket)
-            await socket.broadcast(f"Client #{client_id} says: {data}")
+            # once the admin clicked `play` they get `start point` and `end point`.
+            # then, we wait to see who is the first one to send he right link.
+            # maybe its a good idea to set a timer...
+            data = await player.receive_text()
+            await room.broadcast(f"{player_name} has won the game!")
     except WebSocketDisconnect:
-        socket.disconnect(websocket)
-        await socket.broadcast(f"Client #{client_id} left the chat")
+        room.disconnect(player)
+        await room.broadcast(f"{player_name} left the game.")
 
 
-@app.websocket_route(path="/ws/{room_id}/{client_id}")
-async def websocket_client(webscoket: WebSocket, room_id: str, client_id: str):
-    pass
+@app.websocket("/ws/{player_name}")
+async def create_room(websocket: Player, player_name: str, room_name: str, **kwargs):
+    try: 
+        room: Room = await rooms_manager.create_room(room_name=room_name, kwargs=kwargs)
+        join_room(websocket, player_name, room_id=room.id)
+    except WebSocketDisconnect:
+        websocket.close(reason=f"Could not create room.")

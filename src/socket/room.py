@@ -1,4 +1,5 @@
-from fastapi import WebSocket
+from typing import Union
+from src.socket.player import Player
 import uuid
 
 
@@ -8,7 +9,7 @@ class Room:
         name: str,
         id: str = str(uuid.uuid4()),
         game_rounds: int = 3,
-        max_connections_allowed: int = 10,
+        max_players_allowed: int = 10,
         wikis_to_change_per_round: int = 0,
         time_to_wait_between_rounds: int = 30,
     ):
@@ -17,25 +18,32 @@ class Room:
         self.game_rounds = game_rounds
         self.wikis_to_change_per_round = wikis_to_change_per_round
         self.time_to_wait_between_rounds = time_to_wait_between_rounds
-        self.max_connections_allowed = max_connections_allowed
-        self.active_connections: list[WebSocket] = list()
+        self.max_players_allowed = max_players_allowed
+        self.active_players: list[Player] = list()
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
+    async def connect(self, player: Player):
+        await player.accept()
+        self.active_players.append(player)
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self, player: Player):
+        # Probably should close session first
+        self.active_players.remove(player)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    def disconnect_all(self):
+        self.active_players.clear()
 
     async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+        for player in self.active_players:
+            await player.send_text(message)
 
-    async def is_admin(self, websocket: WebSocket) -> bool:
-        return websocket == self.active_connections[0]
+    async def is_admin(self, player: Player) -> bool:
+        return player == self.active_players[0]
 
     def set_random_id(self) -> str:
         self.id = str(uuid.uuid4())
+
+    def get_player_if_exists(self, player_name: str) -> Union[Player, None]:
+        for active_player in self.active_players:
+            if player_name == active_player.name:
+                return active_player
+        return None
