@@ -33,7 +33,7 @@ async def join_room(websocket: Player, player_name: str, room_id: str):
         await room.broadcast(f"{player_name} left the game.")
 
 
-@app.websocket("/ws/{player_name}")
+@app.websocket("/ws/{player_name}/create-room")
 async def create_room(websocket: Player, player_name: str, room_name: str, **kwargs):
     try:
         room: Room = await rooms_manager.create_room(room_name=room_name, kwargs=kwargs)
