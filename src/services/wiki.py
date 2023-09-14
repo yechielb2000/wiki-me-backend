@@ -10,19 +10,19 @@ class Wiki:
         article: str
 
     def __init__(self) -> None:
-        self.start_point = self.get_random_wiki_page()
-        self.end_point = self.get_random_wiki_page()
+        self.start_point = self.get_random_page()
+        self.end_point = self.get_random_page()
 
-    def get_random_wiki_page(self) -> WikiPage:
+    def get_random_page(self) -> WikiPage:
         url = self._get_random_url()
         article = self._extract_article_from_url(url)
         return self.WikiPage(url=url, article=article)
 
     def change_start_point(self):
-        self.start_point = self.get_random_wiki_page()
+        self.start_point = self.get_random_page()
 
     def change_end_point(self):
-        self.end_point = self.get_random_wiki_page()
+        self.end_point = self.get_random_page()
 
     def _get_random_url(self) -> requests.Response:
         return requests.get(self.WIKI_URL).url
