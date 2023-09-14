@@ -1,8 +1,9 @@
 import json
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from src.socket.rooms_manager import RoomsManager
-from src.socket.room import Room
-from src.socket.player import Player
+from typing import Any
+from fastapi import FastAPI, WebSocketDisconnect
+from src.services.wiki import Wiki
+from src.socket import Player, Room, RoomsManager, SocketMessage, MessageTypes
+
 
 app = FastAPI()
 rooms_manager: RoomsManager = RoomsManager()
@@ -23,11 +24,20 @@ async def join_room(websocket: Player, player_name: str, room_id: str):
         if player in room.active_players:
             await room.broadcast(json.dumps(room.active_players))
         while True:
-            # once the admin clicked `play` they get `start point` and `end point`.
-            # then, we wait to see who is the first one to send he right link.
-            # maybe its a good idea to set a timer...
             data = await player.receive_text()
-            await room.broadcast(f"{player_name} has won the game!")
+            data: SocketMessage = load_json(data)
+            if data.message_type == MessageTypes.PLAY:
+                wiki = Wiki()
+                data.wiki_start_point = wiki.start_point
+                data.wiki_endpoint = wiki.end_point
+                await room.broadcast(data.model_dump_json())
+                while True:
+                    data = await player.receive_text()
+                    data: SocketMessage = load_json(data)
+                    if data.message_type == MessageTypes.WIN:
+                        data.message = f"{player.name} has won!"
+                        await room.broadcast(data.model_dump_json())
+                        break
     except WebSocketDisconnect:
         room.disconnect(player)
         await room.broadcast(f"{player_name} left the game.")
@@ -40,3 +50,7 @@ async def create_room(websocket: Player, player_name: str, room_name: str, **kwa
         join_room(websocket, player_name, room_id=room.id)
     except WebSocketDisconnect:
         websocket.close(reason=f"Could not create room.")
+
+
+def load_json(data: Any) -> SocketMessage:
+    return json.loads(data, object_hook=lambda x: SocketMessage.model_validate(x))
