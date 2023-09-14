@@ -1,7 +1,7 @@
 import json
 from typing import Any
 from fastapi import FastAPI, WebSocketDisconnect
-from src.services.wiki import Wiki
+from src.services import Wiki
 from src.socket import Player, Room, RoomsManager, SocketMessage, MessageTypes
 
 

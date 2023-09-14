@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from src.services.wiki import Wiki
+from src.services import Wiki
 
 
 class MessageTypes:
