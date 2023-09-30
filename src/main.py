@@ -2,7 +2,7 @@ import json
 from fastapi import FastAPI, WebSocketDisconnect
 from src.services import Wiki
 from src.socket import Player, Room
-from src.socket.message import SocketMessage, MessageTypes, load_json
+from src.socket.message import MessageTypes, load_json
 from .rooms_manager import RoomsManager
 
 app = FastAPI()

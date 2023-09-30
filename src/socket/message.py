@@ -16,10 +16,13 @@ class MessageTypes:
 
 class SocketMessage(BaseModel):
     message_type: str
-    message: str
-    wiki_start_point: Wiki.WikiPage
-    wiki_endpoint: Wiki.WikiPage
+    message: str = None
+    wiki_start_point: Wiki.WikiPage = None
+    wiki_endpoint: Wiki.WikiPage = None
 
 
 def load_json(data: str) -> SocketMessage:
+    """
+    load json as SocketMessage model
+    """
     return json.loads(data, object_hook=lambda x: SocketMessage.model_validate(x))
