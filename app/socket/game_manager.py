@@ -1,5 +1,5 @@
 from typing import Dict
-from venv import logger
+from loguru import logger
 
 from app.models.game import Game
 from app.socket.player import Player
@@ -21,7 +21,7 @@ class GameManager:
     async def connect(self, player: Player):
         logger.debug(f'player {player} is connecting...')
         await player.websocket.accept()
-        logger.info(f'player {player} has been connected')
+        logger.success(f'player {player} has been connected')
         self._players[player.player_id] = player
 
     async def disconnect(self, player: Player):
