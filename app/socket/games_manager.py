@@ -36,5 +36,5 @@ class GamesManager:
     def remove_game(self, game_id: str):
         game = self.get_game(game_id)
         if game:
-            logger.debug(f'game {game} has been removed')
+            logger.success(f'game {game} has been removed')
             del self._active_games[game_id]
