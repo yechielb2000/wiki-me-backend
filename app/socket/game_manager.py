@@ -10,6 +10,7 @@ class GameManager:
     def __init__(self, game: Game, player: Player):
         self._game = game
         self._players: Dict[str, Player] = dict()
+        self.logger = logger.bind(game_id=game.game_id)
 
     @property
     def game(self) -> Game:
@@ -19,16 +20,20 @@ class GameManager:
     def players(self) -> Dict[str, Player]:
         return self._players
 
-    async def connect(self, player: Player):
-        await player.connect()
+    def get_player(self, player_id: str) -> Player:
+        # TODO: handle player doesn't exists
+        return self._players[player_id]
+
+    async def add_player(self, player: Player):
         self._players[player.player_id] = player
+        self.logger.info(f'player {player.player_id} added.')
 
-    async def disconnect(self, player: Player):
-        await player.disconnect()
-        del self._players[player.player_id]
+    async def remove_player(self, player_id: str):
+        self._players.pop(player_id, None)
+        self.logger.info(f'player {player_id} removed.')
 
-    async def send_personal_message(self, message: str, player: Player):
-        # TODO: this should be implemented a little different
+    async def send_personal_message(self, message: str, player_id: str):
+        player = self.get_player(player_id)
         await player.websocket.send_text(message)
 
     async def broadcast(self, message: str):
