@@ -1,5 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, WebSocket
 
 from app.socket.games_manager import GamesManager
 
