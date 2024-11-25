@@ -1,9 +1,11 @@
+from typing import Dict
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-from src.socket.room import ConnectionManager
+from app.socket.game import Game
 
 app = FastAPI()
-socket: ConnectionManager = ConnectionManager()
+socket: Game = Game() # This should be generated for new room create.
 
 HTML = """
 <!DOCTYPE html>
@@ -41,6 +43,8 @@ HTML = """
     </body>
 </html>
 """
+
+
 
 
 @app.get("/")
