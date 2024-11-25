@@ -9,6 +9,14 @@ class Player:
         self.player_id = player_id
         self.connected_at = datetime.datetime.now(tz=datetime.UTC)
 
+    async def connect(self):
+        """Handle player connection."""
+        await self.websocket.accept()
+
+    async def disconnect(self):
+        """Handle player disconnection."""
+        await self.websocket.close()
+
     async def send_message(self, message: str):
         """Send a message to the player's WebSocket."""
         await self.websocket.send_text(message)
@@ -16,7 +24,3 @@ class Player:
     async def receive_message(self) -> str:
         """Receive a message from the player's WebSocket."""
         return await self.websocket.receive_text()
-
-    async def disconnect(self):
-        """Handle player disconnection."""
-        await self.websocket.close()

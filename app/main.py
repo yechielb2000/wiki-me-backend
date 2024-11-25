@@ -10,6 +10,18 @@ socket: GamesManager = GamesManager()  # This should be generated for new room c
 async def games():
     return
 
+@app.post("/")
+async def games():
+    return
+
+@app.delete("/")
+async def games():
+    return
+
+@app.get("/")
+async def games():
+    return
+
 
 # @app.websocket("/ws/{client_id}")
 # async def websocket_endpoint(websocket: WebSocket, client_id: int):

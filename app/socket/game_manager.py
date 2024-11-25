@@ -7,7 +7,7 @@ from app.socket.player import Player
 
 
 class GameManager:
-    def __init__(self, game: Game):
+    def __init__(self, game: Game, player: Player):
         self._game = game
         self._players: Dict[str, Player] = dict()
 
@@ -27,7 +27,7 @@ class GameManager:
 
     async def disconnect(self, player: Player):
         logger.debug(f'player {player} is disconnecting')
-        await player.websocket.close()
+        await player.disconnect()
         del self._players[player.player_id]
 
     async def send_personal_message(self, message: str, player: Player):
