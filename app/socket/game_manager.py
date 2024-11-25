@@ -20,13 +20,10 @@ class GameManager:
         return self._players
 
     async def connect(self, player: Player):
-        logger.debug(f'player {player} is connecting...')
-        await player.websocket.accept()
-        logger.success(f'player {player} has been connected')
+        await player.connect()
         self._players[player.player_id] = player
 
     async def disconnect(self, player: Player):
-        logger.debug(f'player {player} is disconnecting')
         await player.disconnect()
         del self._players[player.player_id]
 

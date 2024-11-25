@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import WebSocket
+from loguru import logger
 
 
 class Player:
@@ -11,11 +12,15 @@ class Player:
 
     async def connect(self):
         """Handle player connection."""
+        logger.debug(f'player {self.player_id} is connecting...')
         await self.websocket.accept()
+        logger.success(f'player {self.player_id} is connected.')
 
     async def disconnect(self):
         """Handle player disconnection."""
+        logger.debug(f'player {self.player_id} is disconnecting...')
         await self.websocket.close()
+        logger.success(f'player {self.player_id} has been disconnected.')
 
     async def send_message(self, message: str):
         """Send a message to the player's WebSocket."""
