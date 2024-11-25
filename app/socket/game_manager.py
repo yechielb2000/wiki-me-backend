@@ -7,7 +7,7 @@ from app.socket.player import Player
 
 
 class GameManager:
-    def __init__(self, game: Game, player: Player):
+    def __init__(self, game: Game):
         self._game = game
         self._players: Dict[str, Player] = dict()
         self.logger = logger.bind(game_id=game.game_id)
@@ -24,7 +24,8 @@ class GameManager:
         # TODO: handle player doesn't exists
         return self._players[player_id]
 
-    async def add_player(self, player: Player):
+    def add_player(self, player: Player):
+        # TODO: should check player if already in?
         self._players[player.player_id] = player
         self.logger.info(f'player {player.player_id} added.')
 
@@ -43,3 +44,6 @@ class GameManager:
     async def is_admin(self, player: Player) -> bool:
         # TODO: does game needs an admin? (settings can't be changed anyway)
         return False
+
+    def has_reached_connections_limit(self) -> bool:
+        return len(self._players.keys()) == self._game.max_players
