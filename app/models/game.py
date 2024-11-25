@@ -18,3 +18,6 @@ class Game(BaseModel):
         for case that this uuid is already taken
         """
         self.id = str(uuid4())
+
+    def __str__(self) -> str:
+        return f'[name: {self.name} | id: {self.id}]'

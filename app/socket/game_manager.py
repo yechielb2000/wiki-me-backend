@@ -1,49 +1,42 @@
-import uuid
+from typing import Dict
+from venv import logger
 
-from fastapi import WebSocket
+from app.models.game import Game
+from app.socket.player import Player
 
 
 class GameManager:
-    def __init__(
-            self,
-            name: str,
-            game_rounds: int = 3,
-            max_connections_allowed: int = 10,
-            wikis_to_change_per_round: int = 0,
-            time_to_wait_between_rounds: int = 30,
-    ):
-        self.name = name
-        self.game_rounds = game_rounds
-        self.wikis_to_change_per_round = wikis_to_change_per_round
-        self.time_to_wait_between_rounds = time_to_wait_between_rounds
-        self.max_connections_allowed = max_connections_allowed
-        self.active_connections: list[WebSocket] = list()
-
-        self.generate_id()
+    def __init__(self, game: Game):
+        self._game = game
+        self._players: Dict[str, Player] = dict()
 
     @property
-    def id(self) -> str:
-        return self._id
+    def game(self) -> Game:
+        return self.game
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
+    @property
+    def players(self) -> Dict[str, Player]:
+        return self._players
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    async def connect(self, player: Player):
+        logger.debug(f'player {player} is connecting...')
+        await player.websocket.accept()
+        logger.info(f'player {player} has been connected')
+        self._players[player.player_id] = player
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def disconnect(self, player: Player):
+        logger.debug(f'player {player} is disconnecting')
+        await player.websocket.close()
+        del self._players[player.player_id]
+
+    async def send_personal_message(self, message: str, player: Player):
+        # TODO: this should be implemented a little different
+        await player.websocket.send_text(message)
 
     async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+        for player in self._players.values():
+            await player.websocket.send_text(message)
 
-    async def is_admin(self, websocket: WebSocket) -> bool:
-        return websocket == self.active_connections[0]
-
-    def generate_id(self):
-        self._id = str(uuid.uuid4())
-
-    def __str__(self) -> str:
-        return f'[name: {self.name} | id: {self.id}]'
+    async def is_admin(self, player: Player) -> bool:
+        # TODO: does game needs an admin? (settings can't be changed anyway)
+        return False
