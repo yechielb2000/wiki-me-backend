@@ -9,18 +9,19 @@ class Player:
         self.websocket = websocket
         self.player_id = player_id
         self.connected_at = datetime.datetime.now(tz=datetime.UTC)
+        self.logger = logger.bind(player_id=player_id)
 
     async def connect(self):
         """Handle player connection."""
-        logger.debug(f'player {self.player_id} is connecting...')
+        self.logger.debug(f'player is connecting...')
         await self.websocket.accept()
-        logger.success(f'player {self.player_id} is connected.')
+        self.logger.success(f'player is connected.')
 
     async def disconnect(self):
         """Handle player disconnection."""
-        logger.debug(f'player {self.player_id} is disconnecting...')
+        self.logger.debug(f'player is disconnecting...')
         await self.websocket.close()
-        logger.success(f'player {self.player_id} has been disconnected.')
+        self.logger.success(f'player has been disconnected.')
 
     async def send_message(self, message: str):
         """Send a message to the player's WebSocket."""
