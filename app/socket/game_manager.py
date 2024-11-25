@@ -3,7 +3,7 @@ import uuid
 from fastapi import WebSocket
 
 
-class Game:
+class GameManager:
     def __init__(
             self,
             name: str,
