@@ -27,10 +27,11 @@ class GamesManager:
     def game_exists(self, room_id: str) -> bool:
         return bool(self._active_games.get(room_id, False))
 
-    def add_game(self, game: GameManager) -> None:
-        while game.id in self.games_ids:
-            game.generate_id()
-        self._active_games[game.id] = game
+    def add_game(self, game_manager: GameManager) -> None:
+        while game_manager.game.id in self.games_ids:
+            game_manager.game.generate_new_id()
+            # TODO: check if new id is replacing older id
+        self._active_games[game_manager.game.id] = game_manager
 
     def remove_game(self, game_id: str):
         game = self.get_game(game_id)
