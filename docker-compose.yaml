@@ -1,4 +1,4 @@
-version: '3.7'
+version: '27.3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
@@ -7,6 +7,8 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
+    restart: always
+    
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.13
     container_name: kibana
@@ -14,8 +16,11 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
+    restart: always
+
   redis-stack-server:
     image: redis/redis-stack-server:latest
     container_name: redis-stack-server
     ports:
       - "6379:6379"
+    restart: always

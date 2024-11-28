@@ -1,4 +1,4 @@
-from app.services.redis_conf import redis_client
+from app.services.connections import redis_client
 
 __all__ = [
     'redis_client'
