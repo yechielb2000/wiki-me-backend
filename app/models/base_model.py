@@ -5,17 +5,21 @@ from app.services.connections import redis_client
 
 
 class WikiBaseModel(BaseModel):
-    id: str
+    id: str = None
 
-    def __pydantic_custom_init__(self) -> None:
+    async def __pydantic_custom_init__(self) -> None:
         """initiate logger and bind generic data to each log"""
-        self.logger = logger.bind(model_id=self.id, model_name=self.__class__.__name__)
+        self.id = await redis_client.incr(f"{self.__class__.__name__}:id")
+        self.logger = logger.bind(id=self.id, name=self.__class__.__name__)
+
+    @property
+    def redis_key(self) -> str:
+        return f"{self.__class__.__name__}:{self.id}"
 
     def save_to_redis(self):
         """Save model fields to Redis."""
-        redis_key = f"{self.__class__.__name__}:{self.id}"
         self.logger.info(f"Saving model fields to redis")
-        redis_client.set(redis_key, self.model_dump())
+        redis_client.set(self.redis_key, self.model_dump())
 
     @classmethod
     def load_from_redis(cls, model_id: str):
@@ -29,6 +33,5 @@ class WikiBaseModel(BaseModel):
 
     def delete_from_redis(self):
         """Delete the model from Redis."""
-        redis_key = f"{self.__class__.__name__}:{self.id}"
         self.logger.info(f"Deleting model fields from redis")
-        redis_client.delete(redis_key)
+        redis_client.delete(self.redis_key)

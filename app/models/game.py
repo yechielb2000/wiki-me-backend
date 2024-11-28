@@ -1,11 +1,13 @@
 from datetime import timedelta
 from typing import Annotated
 from uuid import uuid4
-from pydantic import BaseModel, Field
+
+from pydantic import Field
+
+from app.models.base_model import WikiBaseModel
 
 
-class Game(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Game(WikiBaseModel):
     name: str
     game_rounds: Annotated[int, Field(3, gt=0, le=5)]
     max_connections: Annotated[int, Field(3, gt=0, le=10)]
@@ -24,5 +26,3 @@ class Game(BaseModel):
     @property
     def url(self) -> str:
         return f'/game/{self.id}'  # TODO: add domain and route from env variable
-
-
