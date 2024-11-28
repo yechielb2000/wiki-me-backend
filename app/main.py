@@ -9,7 +9,7 @@ from app.socket.player import Player
 
 setup_logger()
 app = FastAPI(title='wiki-me API')
-games_manager: GamesManager = GamesManager()  # This should be generated for new room create.
+games_manager: GamesManager = GamesManager()
 
 
 @app.get("/{game_id}")
