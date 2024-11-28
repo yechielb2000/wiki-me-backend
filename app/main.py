@@ -1,12 +1,14 @@
 from fastapi import FastAPI, WebSocket
 from loguru import logger
 
+from app.logger_setup import setup_logger
 from app.models.game import Game
 from app.socket.game_manager import GameManager
 from app.socket.games_manager import GamesManager
 from app.socket.player import Player
 
-app = FastAPI()
+setup_logger()
+app = FastAPI(title='wiki-me API')
 games_manager: GamesManager = GamesManager()  # This should be generated for new room create.
 
 
