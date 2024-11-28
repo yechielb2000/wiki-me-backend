@@ -12,7 +12,7 @@ class ElasticHandler(logging.Handler):
         self.elastic = elastic
 
     def emit(self, record):
-        self.elastic.index(index='app-logs', doc_type='log', id=record.getMessage(), body=record.__dict__)
+        self.elastic.index(index='app-logs', doc_type='log', body=record.__dict__)
 
 
 def setup_logger():
