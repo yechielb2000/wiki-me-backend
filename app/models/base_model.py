@@ -21,6 +21,11 @@ class WikiBaseModel(BaseModel):
         self.logger.info(f"Saving model fields to redis")
         redis_client.set(self.redis_key, self.model_dump())
 
+    def delete_from_redis(self):
+        """Delete the model from Redis."""
+        self.logger.info(f"Deleting model fields from redis")
+        redis_client.delete(self.redis_key)
+
     @classmethod
     def load_from_redis(cls, model_id: str):
         """Load the model from Redis."""
@@ -30,8 +35,3 @@ class WikiBaseModel(BaseModel):
         if not data:
             raise ValueError(f"No data found in Redis for key {redis_key}")
         return cls.model_validate_json(data)
-
-    def delete_from_redis(self):
-        """Delete the model from Redis."""
-        self.logger.info(f"Deleting model fields from redis")
-        redis_client.delete(self.redis_key)
