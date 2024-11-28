@@ -8,7 +8,7 @@ services:
     ports:
       - "9200:9200"
     restart: always
-    
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.13
     container_name: kibana
@@ -24,3 +24,6 @@ services:
     ports:
       - "6379:6379"
     restart: always
+
+
+# TODO: create docker image for app and add it here
