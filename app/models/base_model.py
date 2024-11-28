@@ -35,3 +35,6 @@ class WikiBaseModel(BaseModel):
         if not data:
             raise ValueError(f"No data found in Redis for key {redis_key}")
         return cls.model_validate_json(data)
+
+    def __str__(self) -> str:
+        return self.redis_key

@@ -3,12 +3,11 @@ from loguru import logger
 
 from app.logger_setup import setup_logger
 from app.models.game import Game
-from app.socket.game_manager import GameManager
-from app.socket.games_manager import GamesManager
-from app.socket.player import Player
+from app.socket_managers.game_manager import GameManager
+from app.socket_managers.games_manager import GamesManager
+from app.socket_managers.player import Player
 
-setup_logger()
-app = FastAPI(title='wiki-me API')
+app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
 games_manager: GamesManager = GamesManager()
 
 
@@ -19,17 +18,18 @@ async def games(game_id: str):
 
 @app.post("/")
 async def games():
-    return
+    return ""
 
 
 @app.delete("/")
 async def games():
-    return
+    return ""
 
 
 @app.get("/")
 async def games():
-    return
+    return "Hello"
+
 
 # TODO depends on cookie (he should first create
 @app.websocket("/ws/join/{game_id}")
@@ -42,12 +42,6 @@ async def join_game(websocket: WebSocket, game_id: str, player_id: str):
         logger.success(f'player {player_id} has joined game {game_id}')
         # TODO: should close connection?
         # TODO: replace to HTTP request
-
-
-# TODO: join a game
-@app.post('/game/{game_id}')
-async def join_game_http_v(game_id: str, player_id: str):
-    pass
 
 
 @app.websocket('/ws/game/')

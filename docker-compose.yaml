@@ -16,6 +16,8 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
+    depends_on:
+      - elasticsearch
     restart: always
 
   redis-stack-server:
@@ -25,5 +27,10 @@ services:
       - "6379:6379"
     restart: always
 
-
-# TODO: create docker image for app and add it here
+  wiki-me-application:
+      container_name: wiki-app
+      build:
+       dockerfile: Dockerfile
+      ports:
+        - "8000:8000"
+      restart: always

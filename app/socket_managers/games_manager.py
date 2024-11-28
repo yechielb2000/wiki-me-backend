@@ -3,7 +3,7 @@ from typing import Dict, List
 from loguru import logger
 
 from app.exceptions import GameNotFound
-from app.socket.game_manager import GameManager
+from app.socket_managers.game_manager import GameManager
 
 
 class GamesManager:
@@ -25,6 +25,7 @@ class GamesManager:
         return game
 
     def add_game_manager(self, game_manager: GameManager) -> None:
+        # TODO: we want to save active games in redis
         while game_manager.game.id in self.games_ids:
             game_manager.game.generate_new_id()
             # TODO: check if new id is replacing older id

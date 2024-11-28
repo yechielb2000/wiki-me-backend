@@ -5,7 +5,7 @@ from loguru import logger
 from wikipedia import wikipedia
 
 from app.models.game import Game
-from app.socket.player import Player
+from app.socket_managers.player import Player
 
 
 class GameManager:
@@ -60,6 +60,7 @@ class GameManager:
         points = self.get_new_points()
         self.broadcast(points)
         while True:
+
             # TODO when going out of wiki scope raise an exception and return him to the last page
             # TODO: use redis pub/sub for managing users updates
             #push_handler_func
