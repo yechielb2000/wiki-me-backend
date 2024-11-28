@@ -9,4 +9,5 @@ dependencies = [
     "loguru>=0.7.2",
     "uvicorn[standard]>=0.32.1",
     "websockets>=14.1",
+    "wikipedia>=1.4.0",
 ]
