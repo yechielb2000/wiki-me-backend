@@ -24,3 +24,5 @@ class Game(BaseModel):
     @property
     def url(self) -> str:
         return f'/game/{self.id}'  # TODO: add domain and route from env variable
+
+
