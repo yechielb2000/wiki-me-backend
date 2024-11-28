@@ -2,7 +2,9 @@ import os
 
 __all__ = [
     'REDIS_ADDRESS',
-    'REDIS_PORT'
+    'REDIS_PORT',
+    'ELASTICSEARCH_ADDRESS',
+    'ELASTICSEARCH_PORT'
 ]
 
 # Redis stack server
