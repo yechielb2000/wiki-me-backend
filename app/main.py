@@ -31,21 +31,6 @@ async def games():
 async def games():
     return
 
-
-# @app.websocket("/ws/{client_id}")
-# async def websocket_endpoint(websocket: WebSocket, client_id: int):
-#     await socket.connect(websocket)
-#     if websocket in socket.active_connections:
-#         await socket.broadcast(f"{socket.active_connections}")
-#     try:
-#         while True:
-#             data = await websocket.receive_text()
-#             await socket.send_personal_message(f"You wrote: {data}", websocket)
-#             await socket.broadcast(f"Client #{client_id} says: {data}")
-#     except WebSocketDisconnect:
-#         socket.disconnect(websocket)
-#         await socket.broadcast(f"Client #{client_id} left the chat")
-
 # TODO depends on cookie (he should first create
 @app.websocket("/ws/join/{game_id}")
 async def join_game(websocket: WebSocket, game_id: str, player_id: str):
