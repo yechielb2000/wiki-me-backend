@@ -1,6 +1,8 @@
+import json
 from typing import Dict
 
 from loguru import logger
+from wikipedia import wikipedia
 
 from app.models.game import Game
 from app.socket.player import Player
@@ -47,3 +49,24 @@ class GameManager:
 
     def has_reached_connections_limit(self) -> bool:
         return len(self._players.keys()) == self._game.max_players
+
+    def round(self):
+        """
+        Manage round flow. get new points and send them to clients.
+        Then wait to get the first user to arrive.
+        First user to send an update is won because the client triggered when the right wiki id pops up,
+        then it tells the server that he arrived.
+        """
+        points = self.get_new_points()
+        self.broadcast(points)
+        while True:
+            # TODO when going out of wiki scope raise an exception and return him to the last page
+            # TODO: use redis pub/sub for managing users updates
+            #push_handler_func
+            pass
+
+    def get_new_points(self) -> str:
+        """
+        :return: new start point wiki title. new destination wiki title.
+        """
+        return json.dumps(dict(start_point=wikipedia.random(), end_point=wikipedia.random()))

@@ -1,7 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
 from uuid import uuid4
-
 from pydantic import BaseModel, Field
 
 
@@ -12,7 +11,6 @@ class Game(BaseModel):
     max_connections: Annotated[int, Field(3, gt=0, le=10)]
     wait_between_rounds: Annotated[timedelta, Field(ge=3, lt=30)]
     round_duration: Annotated[timedelta, Field(gt=120, le=300)]
-    language: str
 
     def generate_new_id(self):
         """
