@@ -1,5 +1,5 @@
 from loguru import logger
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
 
 from app.services.connections import redis_client
 
@@ -7,10 +7,12 @@ from app.services.connections import redis_client
 class WikiBaseModel(BaseModel):
     id: str = None
 
-    async def __pydantic_custom_init__(self) -> None:
-        """initiate logger and bind generic data to each log"""
-        self.id = await redis_client.incr(f"{self.__class__.__name__}:id")
-        self.logger = logger.bind(id=self.id, name=self.__class__.__name__)
+    def __pydantic_init_subclass__(self):
+        self._logger = logger.bind(id=self.id, cls=self.__class__.__name__)
+
+    @property
+    def logger(self):
+        return self._logger
 
     @property
     def redis_key(self) -> str:

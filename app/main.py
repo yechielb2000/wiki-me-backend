@@ -3,27 +3,31 @@ from loguru import logger
 
 from app.logger_setup import setup_logger
 from app.models.game import Game
-from app.socket_managers.game_manager import GameManager
+from app.socket_managers.game_room import GameRoom
 from app.socket_managers.games_manager import GamesManager
 from app.socket_managers.player import Player
 
 app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
 games_manager: GamesManager = GamesManager()
 
+# make token for session
 
-@app.get("/{game_id}")
+
+@app.get("/games")
 async def games(game_id: str):
-    return games_manager.get_game_manager(game_id)
+    game_room = games_manager.get_game_manager(game_id)
+    return
 
 
-@app.post("/")
-async def games():
+@app.post("/games")
+async def games(game_id: str):
     return ""
 
 
-@app.delete("/")
-async def games():
-    return ""
+@app.delete("/games")
+async def games(game_id: str):
+    """ Delete a game if you are the game admin. """
+    pass
 
 
 @app.get("/")
@@ -47,7 +51,7 @@ async def join_game(websocket: WebSocket, game_id: str, player_id: str):
 @app.websocket('/ws/game/')
 async def create_game(websocket: WebSocket, game: Game, player_id: str):
     player = Player(websocket, player_id)
-    game_manager = GameManager(game)
+    game_manager = GameRoom(game)
     game_manager.add_player(player)
     games_manager.add_game_manager(game_manager)
     await game_manager.broadcast(f"new game created: {game_manager.game.url}")

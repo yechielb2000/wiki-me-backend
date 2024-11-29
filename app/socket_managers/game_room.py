@@ -8,15 +8,15 @@ from app.models.game import Game
 from app.socket_managers.player import Player
 
 
-class GameManager:
-    def __init__(self, game: Game):
-        self._game = game
+class GameRoom:
+    def __init__(self, game_id: str):
+        self._game = Game.load_from_redis(game_id)
         self._players: Dict[str, Player] = dict()
-        self.logger = logger.bind(game_id=game.game_id)
+        self.logger = logger.bind(game_id=game_id)
 
     @property
     def game(self) -> Game:
-        return self.game
+        return self._game
 
     @property
     def players(self) -> Dict[str, Player]:
@@ -43,9 +43,8 @@ class GameManager:
         for player in self._players.values():
             await player.websocket.send_text(message)
 
-    async def is_admin(self, player: Player) -> bool:
-        # TODO: does game needs an admin? (settings can't be changed anyway)
-        return False
+    def get_game_admin(self) -> Player:
+        return list(filter(lambda player: player.admin, self._players.values()))[0]
 
     def has_reached_connections_limit(self) -> bool:
         return len(self._players.keys()) == self._game.max_players
@@ -60,10 +59,9 @@ class GameManager:
         points = self.get_new_points()
         self.broadcast(points)
         while True:
-
             # TODO when going out of wiki scope raise an exception and return him to the last page
             # TODO: use redis pub/sub for managing users updates
-            #push_handler_func
+            # push_handler_func
             pass
 
     def get_new_points(self) -> str:

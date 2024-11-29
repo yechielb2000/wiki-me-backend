@@ -5,11 +5,24 @@ from loguru import logger
 
 
 class Player:
-    def __init__(self, websocket: WebSocket, player_id: str):
+    def __init__(self, websocket: WebSocket, player_id: str, admin: bool = False):
+        self._admin = admin
         self.websocket = websocket
-        self.player_id = player_id
-        self.connected_at = datetime.datetime.now(tz=datetime.UTC)
+        self._player_id = player_id
+        self._connected_at = datetime.datetime.now(tz=datetime.UTC)
         self.logger = logger.bind(player_id=player_id)
+
+    @property
+    def admin(self) -> bool:
+        return self._admin
+
+    @property
+    def player_id(self) -> str:
+        return self._player_id
+
+    @property
+    def connected_at(self) -> datetime.datetime:
+        return self.connected_at
 
     async def connect(self):
         """Handle player connection."""
