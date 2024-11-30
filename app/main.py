@@ -16,12 +16,12 @@ games_manager: GamesManager = GamesManager()
 
 @app.get("/games")
 async def games(game_id: str):
-    game_room = games_manager.get_game_manager(game_id)
-    return
+    game_room = Game.load_from_redis(game_id)
+    return game_room.model_dump()
 
 
 @app.post("/games")
-async def games(game_id: str):
+async def games(game: Game):
     return ""
 
 
@@ -30,10 +30,6 @@ async def games(game_id: str):
     """ Delete a game if you are the game admin. """
     pass
 
-
-@app.get("/")
-async def games():
-    return "Hello"
 
 
 # TODO depends on cookie (he should first create

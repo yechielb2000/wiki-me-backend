@@ -26,15 +26,15 @@ class Player:
 
     async def connect(self):
         """Handle player connection."""
-        self.logger.debug(f'player is connecting...')
+        self.logger.debug('player is connecting...')
         await self.websocket.accept()
-        self.logger.success(f'player is connected.')
+        self.logger.success('player is connected.')
 
     async def disconnect(self):
         """Handle player disconnection."""
-        self.logger.debug(f'player is disconnecting...')
+        self.logger.debug('player is disconnecting...')
         await self.websocket.close()
-        self.logger.success(f'player has been disconnected.')
+        self.logger.success('player has been disconnected.')
 
     async def send_message(self, message: str):
         """Send a message to the player's WebSocket."""

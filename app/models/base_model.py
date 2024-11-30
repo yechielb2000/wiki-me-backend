@@ -21,19 +21,19 @@ class WikiBaseModel(BaseModel):
 
     def save_to_redis(self):
         """Save model fields to Redis."""
-        self.logger.info(f"Saving model fields to redis")
+        self.logger.info("Saving model fields to redis")
         redis_client.set(self.redis_key, self.model_dump())
 
     def delete_from_redis(self):
         """Delete the model from Redis."""
-        self.logger.info(f"Deleting model fields from redis")
+        self.logger.info("Deleting model fields from redis")
         redis_client.delete(self.redis_key)
 
     @classmethod
     def load_from_redis(cls, model_id: str):
         """Load the model from Redis."""
         redis_key = f"{cls.__name__}:{model_id}"
-        logger.info(f"Loading model fields from redis", model_id=model_id, model_name=cls.__name__)
+        logger.info("Loading model fields from redis", model_id=model_id, model_name=cls.__name__)
         data = redis_client.get(redis_key)
         if not data:
             raise ValueError(f"No data found in Redis for key {redis_key}")
