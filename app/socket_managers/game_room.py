@@ -2,7 +2,6 @@ import json
 from typing import Dict
 
 from loguru import logger
-from wikipedia import wikipedia
 
 from app.models.game import Game
 from app.socket_managers.player import Player
@@ -56,16 +55,11 @@ class GameRoom:
         First user to send an update is won because the client triggered when the right wiki id pops up,
         then it tells the server that he arrived.
         """
-        points = self.get_new_points()
+        start_point, end_point = next(self.game.get_rounds_points())  # should use next?
+        points = json.dumps(dict(startpoint=start_point.model_dump(), endpoint=end_point.model_dump()))
         self.broadcast(points)
         while True:
             # TODO when going out of wiki scope raise an exception and return him to the last page
             # TODO: use redis pub/sub for managing users updates
             # push_handler_func
             pass
-
-    def get_new_points(self) -> str:
-        """
-        :return: new start point wiki title. new destination wiki title.
-        """
-        return json.dumps(dict(start_point=wikipedia.random(), end_point=wikipedia.random()))
