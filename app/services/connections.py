@@ -8,11 +8,6 @@ __all__ = [
     'elastic_client'
 ]
 
-redis_client = Redis(
-    host=REDIS_ADDRESS,
-    port=REDIS_PORT,
-    decode_responses=True,
-    ssl=True
-)
+redis_client = Redis(host=REDIS_ADDRESS, port=REDIS_PORT,decode_responses=True)
 
 elastic_client = Elasticsearch(f'{ELASTICSEARCH_ADDRESS}:{ELASTICSEARCH_PORT}')

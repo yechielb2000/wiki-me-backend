@@ -18,17 +18,18 @@ class Game(WikiBaseModel):
     max_connections: Annotated[int, Field(3, gt=0, le=10)]
     wait_between_rounds: Annotated[timedelta, Field(ge=3, lt=30)]
     round_duration: Annotated[timedelta, Field(gt=120, le=300)]
-    rounds: List[Rounds] = []
+    rounds: List[Rounds] | None = []
 
     @property
     def url(self) -> str:
         # This will not be necessary
         return f'/game/{self.id}'  # TODO: add domain and route from env variable
 
-    @field_validator('rounds')
-    def generate_rounds(self, rounds):
+    @classmethod
+    @field_validator('rounds', 'rounds_count')
+    def generate_rounds(cls, rounds, rounds_count):
         """ Get start and end points of each game round. """
-        rounds_titles = iter(wikipedia.random(pages=self.rounds_count * 2))
+        rounds_titles = iter(wikipedia.random(pages=rounds_count * 2))
         for start_point, end_point in zip(rounds_titles, rounds_titles):
             rounds.append(Rounds(start_point=start_point, end_point=end_point))
         return rounds

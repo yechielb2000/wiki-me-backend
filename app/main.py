@@ -22,7 +22,9 @@ async def games(game_id: str):
 
 @app.post("/games")
 async def games(game: Game):
-    return ""
+    game_model = Game.model_validate_json(game)
+    game_model.save_to_redis()
+    return game_model.redis_key
 
 
 @app.delete("/games")

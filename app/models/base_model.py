@@ -1,14 +1,13 @@
-from loguru import logger
-from pydantic import BaseModel
-
 from app.services.connections import redis_client
+from loguru import logger
+from pydantic import BaseModel, model_validator
 
 
 class WikiBaseModel(BaseModel):
-    id: str = None
 
-    def __pydantic_init_subclass__(self):
-        self.id = redis_client.incr(f"{self.__class__.__name__}:id")  # is this suppose to be async?
+    @model_validator(mode='after')
+    def custom_init(self):
+        self._id = redis_client.incr(f"{self.__class__.__name__}:id")  # is this suppose to be async?
         self._logger = logger.bind(id=self.id, cls=self.__class__.__name__)
 
     @property

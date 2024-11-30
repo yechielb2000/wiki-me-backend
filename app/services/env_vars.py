@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 # Redis stack server
-REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS', '0.0.0.0')
+REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS', '127.0.0.1')
 REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 # Elasticsearch
