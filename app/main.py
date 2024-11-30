@@ -10,6 +10,7 @@ from app.socket_managers.player import Player
 app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
 games_manager: GamesManager = GamesManager()
 
+
 # make token for session
 
 
