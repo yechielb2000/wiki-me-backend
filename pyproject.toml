@@ -10,7 +10,6 @@ dependencies = [
     "loguru>=0.7.2",
     "pre-commit>=4.0.1",
     "redis[hiredis]>=5.2.0",
-    "ruff>=0.8.1",
     "uvicorn[standard]>=0.32.1",
     "websockets>=14.1",
     "wikipedia>=1.4.0",

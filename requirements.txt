@@ -1,4 +1,0 @@
-fastapi[all]
-websockets
-uvicorn[standard]
-loguru
