@@ -10,4 +10,4 @@ COPY uv.lock /
 
 RUN uv sync --frozen
 
-CMD ["uv", "run", "fastapi", "dev", "--host", "0.0.0.0"]
+ENTRYPOINT ["uv", "run", "fastapi", "dev", "--host", "0.0.0.0"]

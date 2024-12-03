@@ -30,7 +30,7 @@ services:
   wiki-me-application:
       container_name: wiki-app
       build:
-       dockerfile: Dockerfile
+        dockerfile: Dockerfile
       ports:
         - "8000:8000"
       restart: always
