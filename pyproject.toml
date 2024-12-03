@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "elasticsearch>=8.16.0",
+    "fastapi-users[redis]>=14.0.0",
     "fastapi[standard]>=0.115.5",
     "loguru>=0.7.2",
     "pre-commit>=4.0.1",

@@ -1,4 +1,6 @@
-from fastapi import FastAPI, WebSocket
+from typing import Annotated
+
+from fastapi import FastAPI, WebSocket, Cookie, status, WebSocketException
 from loguru import logger
 
 from app.logger_setup import setup_logger
@@ -8,18 +10,14 @@ from app.socket_managers.games_manager import GamesManager
 from app.socket_managers.player import Player
 
 app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
+
 games_manager: GamesManager = GamesManager()
-
-
-# make token for session
 
 
 @app.get("/games")
 async def games(game_id: str):
     game_room = Game.load_from_redis(game_id)
     return game_room.model_dump()
-
-
 
 
 @app.post("/games")
@@ -34,11 +32,19 @@ async def games(game_id: str):
     """ Delete a game if you are the game admin. """
     pass
 
+@app.middleware("http")
 
 
 # TODO depends on cookie (he should first create
 @app.websocket("/ws/join/{game_id}")
-async def join_game(websocket: WebSocket, game_id: str, player_id: str):
+async def join_game(
+        websocket: WebSocket,
+        game_id: str,
+        player_id: str,
+        session: Annotated[str | None, Cookie()] = None):
+    if session is None:
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
+
     player = Player(websocket, player_id)
     await player.connect()
     game_manager = games_manager.get_game_manager(game_id)
