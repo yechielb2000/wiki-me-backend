@@ -4,49 +4,48 @@ from typing import Dict
 from loguru import logger
 
 from app.models.game import Game
-from app.socket_managers.player import Player
+from app.socket_managers.player_connection import PlayerConnection
 
 
 class GameRoom:
     def __init__(self, game_id: str):
-        self._game = Game.load_from_redis(game_id)
-        self._players: Dict[str, Player] = dict()
-        self.logger = logger.bind(game_id=game_id)
+        self._game = Game.get(game_id)
+        self._connections: Dict[str, PlayerConnection] = dict()
+        self._logger = logger.bind(game_id=game_id)
 
     @property
     def game(self) -> Game:
         return self._game
 
     @property
-    def players(self) -> Dict[str, Player]:
-        return self._players
+    def connections(self) -> Dict[str, PlayerConnection]:
+        return self._connections
 
-    def get_player(self, player_id: str) -> Player:
+    def get_player(self, player_id: str) -> PlayerConnection:
         # TODO: handle player doesn't exists
-        return self._players[player_id]
+        return self._connections[player_id]
 
-    def add_player(self, player: Player):
-        # TODO: should check player if already in?
-        self._players[player.player_id] = player
-        self.logger.info(f'player {player.player_id} added.')
+    def add_player(self, connection: PlayerConnection):
+        self._connections[connection.player.id] = connection
+        self._logger.info(f'player {connection.player.id} added.')
 
     async def remove_player(self, player_id: str):
-        self._players.pop(player_id, None)
-        self.logger.info(f'player {player_id} removed.')
+        self._connections.pop(player_id, None)
+        self._logger.info(f'player {player_id} removed.')
 
     async def send_personal_message(self, message: str, player_id: str):
-        player = self.get_player(player_id)
-        await player.websocket.send_text(message)
+        connection = self.get_player(player_id)
+        await connection.send_message(message)
 
     async def broadcast(self, message: str):
-        for player in self._players.values():
-            await player.websocket.send_text(message)
+        for connection in self._connections.values():
+            await connection.send_message(message)
 
-    def get_game_admin(self) -> Player:
-        return list(filter(lambda player: player.admin, self._players.values()))[0]
+    def get_game_admin(self) -> PlayerConnection:
+        return list(filter(lambda player: player.admin, self._connections.values()))[0]
 
     def has_reached_connections_limit(self) -> bool:
-        return len(self._players.keys()) == self._game.max_players
+        return len(self._connections.keys()) == self._game.max_connections
 
     def round(self):
         """

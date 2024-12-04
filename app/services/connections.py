@@ -1,5 +1,5 @@
 from elasticsearch import Elasticsearch
-from redis import Redis
+from redis.asyncio.client import Redis
 
 from app.services.env_vars import *
 

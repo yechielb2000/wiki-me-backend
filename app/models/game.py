@@ -4,7 +4,7 @@ from typing import Annotated, List
 import wikipedia
 from pydantic import Field, BaseModel, field_validator
 
-from app.models.base_model import WikiBaseModel
+from app.models.redis_actions import RedisActions
 
 
 class Rounds(BaseModel):
@@ -12,7 +12,7 @@ class Rounds(BaseModel):
     end_point: str
 
 
-class Game(WikiBaseModel):
+class Game(RedisActions):
     name: str
     rounds_count: Annotated[int, Field(3, gt=0, le=5)]
     max_connections: Annotated[int, Field(3, gt=0, le=10)]
