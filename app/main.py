@@ -2,19 +2,26 @@ import uuid
 from typing import Annotated
 from urllib.request import Request
 
-from fastapi import FastAPI, WebSocket, Cookie, status, WebSocketException, HTTPException
+from fastapi import FastAPI, WebSocket, Cookie, status, WebSocketException, HTTPException, Depends
+from fastapi.responses import JSONResponse
+from fastapi_csrf_protect.exceptions import CsrfProtectError
 from loguru import logger
 
 from app.logger_setup import setup_logger
 from app.models.game import Game
 from app.models.player import Player
+from app.routers import games_router, auth_router
+from app.routers.auth import validate_csrf
 from app.socket_managers.game_room import GameRoom
 from app.socket_managers.games_manager import GamesManager
 from app.socket_managers.player_connection import PlayerConnection
 
+games_manager: GamesManager = GamesManager()
+
 app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
 
-games_manager: GamesManager = GamesManager()
+app.include_router(auth_router)
+app.include_router(games_router, dependencies=[Depends(validate_csrf)])
 
 
 @app.middleware('http')
@@ -28,6 +35,11 @@ async def player_session(request: Request, call_next):
 
     response = await call_next(request)
     return response
+
+
+@app.exception_handler(CsrfProtectError)
+def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
+    return JSONResponse(status_code=exc.status_code, content={'detail': exc.message})
 
 
 # TODO depends on cookie (he should first create
