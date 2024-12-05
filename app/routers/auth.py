@@ -4,6 +4,7 @@ from fastapi_csrf_protect import CsrfProtect
 from loguru import logger
 from pydantic import BaseModel
 
+from app.models.player import Player
 from app.services.env_vars import CSRF_SECRET_KEY
 
 
@@ -36,3 +37,13 @@ def validate_csrf(request: Request, csrf_protect: CsrfProtect = Depends()):
     except Exception as e:
         logger.warning(f'User CSRF token validation failed', request=request, csrf_protect=csrf_protect)
         raise HTTPException(status_code=403, detail="CSRF validation failed")
+
+@auth_router.post("/login", response_model=Player)
+async def login(request: Request, name: str):
+    """
+    Creating player.
+    Player is the entity for the user, we use the player id to validate its sessions.
+    """
+    player = Player(name=name)
+    player.create()
+    return player
