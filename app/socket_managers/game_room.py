@@ -8,10 +8,10 @@ from app.socket_managers.player_connection import PlayerConnection
 
 
 class GameRoom:
-    def __init__(self, game_id: str):
-        self._game = Game.get(game_id)
+    def __init__(self, game: Game):
+        self._game = game
         self._connections: Dict[str, PlayerConnection] = dict()
-        self._logger = logger.bind(game_id=game_id)
+        self._logger = logger.bind(game_id=game.id)
 
     @property
     def game(self) -> Game:

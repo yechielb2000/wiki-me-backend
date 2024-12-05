@@ -17,4 +17,4 @@ ELASTICSEARCH_ADDRESS = os.environ.get('ELASTICSEARCH_URL', 'http://localhost')
 ELASTICSEARCH_PORT = os.environ.get('ELASTICSEARCH_PORT', 9200)
 
 # CSRF Token
-CSRF_SECRET_KEY = os.environ.get('CSRF_SECRET_KEY', '<KEY>')  # make sure to make this key on prod
+CSRF_SECRET_KEY = os.environ.get('CSRF_SECRET_KEY', '1234')  # make sure to make this key on prod

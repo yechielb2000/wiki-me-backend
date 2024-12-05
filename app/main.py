@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,12 +5,9 @@ from fastapi_csrf_protect.exceptions import CsrfProtectError
 
 from app.logger_setup import setup_logger
 from app.routers import games_router, auth_router
-from app.routers.auth import validate_csrf
-from app.socket_managers.games_manager import GamesManager
+from app.routers.auth import validate_csrf, csrf_header
 
-games_manager: GamesManager = GamesManager()
-
-app = FastAPI(title='wiki-me API', on_startup=[setup_logger])
+app = FastAPI(title='Wiki Me API', on_startup=[setup_logger])
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,42 +40,9 @@ def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
 
 
 app.include_router(auth_router)
-app.include_router(games_router, dependencies=[Depends(validate_csrf)])
+app.include_router(games_router, dependencies=[Depends(validate_csrf), Depends(csrf_header)])
 
 
 @app.get('/')
 def main(request: Request):
     return {'hello world'}
-
-
-# if __name__ == '__main__':
-#     uvicorn.run(app, host='0.0.0.0', port=8080)
-
-# TODO depends on cookie (he should first create
-# @app.websocket("/ws/join/{game_id}")
-# async def play(
-#         websocket: WebSocket,
-#         game_id: str,
-#         session: Annotated[str | None, Cookie()] = None):
-#     if session is None:
-#         raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
-#     player_id = websocket.state.player_id  # should have player_id in state after session_status middleware
-#     player = Player(id=player_id, name='random name')
-#     player_connection = PlayerConnection(websocket, player)
-#     await player_connection.connect()
-#     game_manager = games_manager.get_game_manager(game_id)
-#     if not game_manager.has_reached_connections_limit():
-#         game_manager.add_player(player_connection)
-#         logger.success(f'player {player_id} has joined game {game_id}')
-#         # TODO: should close connection?
-#         # TODO: replace to HTTP request
-#
-#
-# @app.websocket('/ws/game/')
-# async def create_game(websocket: WebSocket, game: Game, player_id: uuid.UUID):
-#     # TODO: should be http
-#     player = PlayerConnection(websocket, player_id)
-#     game_manager = GameRoom(game)
-#     game_manager.add_player(player)
-#     games_manager.add_game_manager(game_manager)
-#     await game_manager.broadcast(f"new game created: {game_manager.game.url}")

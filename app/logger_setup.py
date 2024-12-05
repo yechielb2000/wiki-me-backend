@@ -13,7 +13,8 @@ class ElasticHandler(logging.Handler):
 
     def emit(self, record):
         # TODO: build a well structured schema for all logs
-        self.elastic.index(index='app-logs', doc_type='log', body=record.__dict__)
+        # self.elastic.index(index='app-logs', doc_type='log', body=record.__dict__)
+        pass
 
 
 def setup_logger():
