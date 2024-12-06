@@ -4,7 +4,7 @@ from typing import Annotated, List
 import wikipedia
 from pydantic import Field, BaseModel, field_validator
 
-from app.models.redis_actions import RedisActions
+from app.models.base_redis_entity import BaseRedisEntity
 
 
 class Rounds(BaseModel):
@@ -12,13 +12,13 @@ class Rounds(BaseModel):
     end_point: str
 
 
-class Game(RedisActions):
+class Game(BaseRedisEntity):
     name: str
     rounds_count: Annotated[int, Field(3, gt=0, le=5)]
     max_connections: Annotated[int, Field(3, gt=0, le=10)]
     wait_between_rounds: Annotated[timedelta, Field(ge=3, lt=30)]
     round_duration: Annotated[timedelta, Field(gt=120, le=300)]
-    rounds: List[Rounds] | None = []
+    rounds: List[Rounds] | None = Field(default_factory=list(), gt=0)
 
     @property
     def url(self) -> str:

@@ -8,12 +8,8 @@ from redis.typing import ExpiryT
 from app.services.connections import redis_client
 
 
-class RedisActions(BaseModel):
+class BaseRedisEntity(BaseModel):
     id: str | None = None
-
-    def __init__(self, /, **data: any) -> None:
-        super().__init__(**data)
-        self._logger = logger.bind(id=self.id, cls=self.__class__.__name__)
 
     @classmethod
     async def generate_id(cls) -> str:
@@ -21,20 +17,21 @@ class RedisActions(BaseModel):
         return str(await redis_client.incr(f"{cls.__name__}:id"))
 
     @property
-    def redis_key(self) -> str:
+    async def redis_key(self) -> str:
+        if not self.id:
+            self.id = await self.generate_id()
         return f"{self.__class__.__name__}:{self.id}"
 
     async def create(self, ex: ExpiryT = timedelta(hours=1)):
-        """Save model fields to Redis."""
-        if not self.id:
-            self.id = await self.generate_id()
-        self._logger.info("Saving model fields to redis")
-        await redis_client.set(self.redis_key, json.dumps(self.model_dump()), ex=ex)
+        """ Save model fields to Redis. """
+        logger.info("Saving model fields to redis", model_id=self.id)
+        key = await self.redis_key
+        await redis_client.set(key, json.dumps(self.model_dump()), ex=ex)
 
     async def delete(self):
-        """Delete the model from Redis."""
-        self._logger.info("Deleting model fields from redis")
-        await redis_client.delete(self.redis_key)
+        """ Delete the model from Redis. """
+        logger.info("Deleting model fields from redis", model_id=self.id)
+        await redis_client.delete(await self.redis_key)
 
     @classmethod
     async def get(cls, model_id: str):

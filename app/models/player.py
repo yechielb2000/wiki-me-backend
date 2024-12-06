@@ -1,6 +1,6 @@
-from app.models.redis_actions import RedisActions
+from app.models.base_redis_entity import BaseRedisEntity
 
 
-class Player(RedisActions):
+class Player(BaseRedisEntity):
     admin: bool = False
     name: str
