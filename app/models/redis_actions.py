@@ -17,6 +17,7 @@ class RedisActions(BaseModel):
 
     @classmethod
     async def generate_id(cls) -> str:
+        """ Generate a unique id in redis for this model. """
         return str(await redis_client.incr(f"{cls.__name__}:id"))
 
     @property
@@ -25,6 +26,8 @@ class RedisActions(BaseModel):
 
     async def create(self, ex: ExpiryT = timedelta(hours=1)):
         """Save model fields to Redis."""
+        if not self.id:
+            self.id = await self.generate_id()
         self._logger.info("Saving model fields to redis")
         await redis_client.set(self.redis_key, json.dumps(self.model_dump()), ex=ex)
 
