@@ -9,7 +9,7 @@ from app.services.connections import redis_client
 
 
 class RedisActions(BaseModel):
-    id: str
+    id: str | None = None
 
     def __init__(self, /, **data: any) -> None:
         super().__init__(**data)
